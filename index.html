@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eduventure | Sphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link id="favicon" rel="icon">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #7c8cff;
+      --border: rgba(255,255,255,0.45);
+      --card-bg: rgba(249, 250, 251, 0.5);
+      --glow: rgba(124, 140, 255, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top, #f4f9ffd3, #fbfbfb);
+      color: var(--text);
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* --- Back Button --- */
+    .back {
+      position: fixed;
+      top: 25px;
+      left: 25px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid var(--border);
+    }
+
+    .back img {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+      pointer-events: none; /* Prevent Dragging */
+      -webkit-user-drag: none;
+    }
+
+    .back:hover { transform: scale(1.1); }
+    .back:active { transform: scale(0.9); }
+
+    /* --- Glassmorphism --- */
+    .glass {
+      background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.35));
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      border-radius: 30px;
+    }
+
+    .top {
+      padding: 50px 0 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .icon-top {
+      height: 180px;
+      width: 180px;
+      border-radius: 50%;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      object-fit: cover;
+      border: 6px solid white;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1), 0 0 0 10px rgba(124, 140, 255, 0.05);
+      cursor: pointer;
+      pointer-events: none; /* Prevent Dragging */
+      -webkit-user-drag: none;
+    }
+
+    .section-title {
+      text-align: center;
+      margin: 20px 0 40px;
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 800;
+      background: linear-gradient(to right, #4f46e5, #7c8cff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .features {
+      max-width: 1100px;
+      margin: 0 auto 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      padding: 0 20px;
+      align-items: start;
+    }
+
+    .card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .card-img-container {
+      width: 100%;
+      height: 350px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; 
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+      pointer-events: none;
+      -webkit-user-drag: none;
+    }
+
+    .card:hover img { 
+      transform: scale(1.07) translateY(-5px); 
+    }
+
+    .card h3 { margin-bottom: 10px; font-size: 22px; color: var(--text); }
+
+    .description-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .card p { 
+      color: var(--muted); 
+      font-size: 15px; 
+      white-space: pre-line;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+
+    .card p.collapsed {
+      max-height: 100px;
+      -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    }
+
+    .card p.expanded {
+      max-height: 1000px;
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
+
+    .read-more-btn {
+      background: rgba(124, 140, 255, 0.1);
+      border: none;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .read-more-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .card-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .card a { 
+      font-weight: 600; 
+      color: var(--primary); 
+      text-decoration: none;
+      padding: 12px 24px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: fit-content;
+      transition: all 0.3s ease;
+    }
+
+    .card a:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(124, 140, 255, 0.2);
+    }
+    .card-footer {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: auto;
+      width: 100%;
+    }
+    .card button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px var(--glow);
+      display: inline-block;
+      text-align: center;
+    }
+
+    .card button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(124, 140, 255, 0.4);
+      filter: brightness(1.1);
+    }
+
+    .card button:active {
+      transform: translateY(0);
+    }
+    .card {
+      display: grid;
+      grid-template-columns: 1fr; 
+      padding: 24px;
+      gap: 30px; 
+      transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      align-items: center;
+    }
+
+    /* Tablet: 2 columns */
+    @media (min-width: 600px) {
+      .card {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* PC: 3 columns */
+    @media (min-width: 1024px) {
+      .card {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* Make Headings span the full width of the grid */
+    .card h3, .card h4, .card .card-footer {
+      grid-column: 1 / -1;
+      width: 100%;
+    }
+    /* ===== ADMIN MODAL ===== */
+.admin-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+.admin-overlay.hidden{display:none}
+
+.admin-modal{
+  width:90%;
+  max-width:420px;
+  padding:30px;
+  animation:pop .4s ease;
+}
+
+.admin-check{
+  display:flex;
+  gap:10px;
+  font-weight:600;
+  margin-bottom:20px;
+}
+
+#class-inputs{
+  display:grid;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.admin-modal input{
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+}
+
+.admin-actions{
+  display:flex;
+  gap:10px;
+}
+
+.admin-actions button{
+  flex:1;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.admin-actions .save{
+  background:linear-gradient(135deg,var(--primary),#4f46e5);
+  color:white;
+}
+
+.admin-actions .cancel{
+  background:#e5e7eb;
+}
+
+@keyframes pop{
+  from{transform:scale(.9);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+
+  </style>
+</head>
+<body>
+
+  <a class="back" href="/Faxriddin/index.html">
+    <img src="https://cdn-icons-png.flaticon.com/512/271/271220.png" alt="go back" draggable="false">
+  </a>
+
+  <header class="top">
+    <div style="pointer-events: auto;">
+       <img src="/Faxriddin/icon.jpg" class="icon-top" id="main-logo" alt="English" draggable="false">
+    </div>
+  </header>
+
+  <h1 class="section-title">Faxriddin Baxtiyorov</h1>
+
+  <main class="features">
+    <div class="card glass">
+      <h3 style="text-align: center;">Please register to attend next class to be aware</h3>
+      <div class="card-footer">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSeupi9VGE1_tPmU2XQCfjEMJSCddiHGNyIClGlsReILq56zDQ/viewform?usp=dialog" target="_blank">Register</a>
+      </div>
+    </div>
+  </main>
+  <main class="features">
+    <!-- <div class="card glass">
+      <h3 style="text-align: center;">There is no class for today!</h3>
+    </div> -->
+    <div class="card glass">
+      <h3 id="class-time" style="text-align: center;">Today`s class will be at 16:00</h3>
+      <h4 id="class-room" style="text-align: center;">Class room : 234</h4>
+    </div>
+  </main>
+  <main class="features">
+    <div class="card glass">
+      <h3 style="text-align: center; margin-bottom: 20px;">Available Materials</h3>
+      <button>Join Class 1</button>
+      <button>Join Class 1</button>
+      <button>Join Class 1</button>
+      <button>Join Class 1</button>
+      <button>Join Class 1</button>
+    </div>
+  </main>
+  <!-- ================= ADMIN MODAL ================= -->
+  <div id="admin-overlay" class="admin-overlay hidden">
+    <div class="admin-modal glass">
+      <h2 style="text-align:center;margin-bottom:20px;">Admin Panel</h2>
+
+      <label class="admin-check">
+        <input type="checkbox" id="has-class">
+        There is a class today
+      </label>
+
+      <div id="class-inputs">
+        <input id="admin-time" placeholder="Class time (e.g. 16:00)">
+        <input id="admin-room" placeholder="Class room (e.g. 234)">
+      </div>
+
+      <div class="admin-actions">
+        <button class="save" onclick="saveAdmin()">Save</button>
+        <button class="cancel" onclick="closeAdmin()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCFoVveA6UA96-ctn0oYnyYGqswZE3Y5TU",
+    authDomain: "eduventure0090.firebaseapp.com",
+    databaseURL: "https://eduventure0090-default-rtdb.firebaseio.com",
+    projectId: "eduventure0090",
+    appId: "1:862610232408:web:e86976776065288e19662d"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  db.ref("classData").on("value", snapshot => {
+  const data = snapshot.val();
+  if (data) applyData(data);
+  });
+
+</script>
+
+
+<script>
+  function toggleReadMore(id, btn) {
+    const text = btn.previousElementSibling; 
+    if (text.classList.contains('collapsed')) {
+      text.classList.remove('collapsed');
+      text.classList.add('expanded');
+      btn.innerText = 'Show Less';
+    } else {
+      text.classList.remove('expanded');
+      text.classList.add('collapsed');
+      btn.innerText = 'Read More';
+    }
+}
+
+  const allCards = document.querySelectorAll('.card');
+
+  allCards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      card.style.transform = "translateY(-15px)";
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = "translateY(0)";
+    });
+  });
+
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = "1";
+        entry.target.style.transform = "translateY(0)";
+      }
+    });
+  }, { threshold: 0.1 });
+
+  allCards.forEach(el => {
+    el.style.opacity = "0";
+    el.style.transform = "translateY(30px)";
+    el.style.transition = "all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)";
+    revealObserver.observe(el);
+  });
+/* ================= ADMIN CONFIG ================= */
+const ADMIN_PASSWORD = "pass123XurshiXursandov0090";
+
+const overlay = document.getElementById("admin-overlay");
+const hasClass = document.getElementById("has-class");
+const inputs = document.getElementById("class-inputs");
+const timeInput = document.getElementById("admin-time");
+const roomInput = document.getElementById("admin-room");
+
+const timeEl = document.getElementById("class-time");
+const roomEl = document.getElementById("class-room");
+
+/* ===== LOAD DATA ===== */
+
+/* ===== SHORTCUT ===== */
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.altKey && e.key.toLowerCase() === "i") {
+    e.preventDefault();
+    const pass = prompt("Admin password:");
+    if (pass === ADMIN_PASSWORD) openAdmin();
+    else alert("❌ Wrong password");
+  }
+});
+
+function openAdmin(){
+  overlay.classList.remove("hidden");
+  if (saved){
+    hasClass.checked = saved.hasClass;
+    inputs.style.display = saved.hasClass ? "grid" : "none";
+    timeInput.value = saved.time || "";
+    roomInput.value = saved.room || "";
+  }
+}
+
+function closeAdmin(){
+  overlay.classList.add("hidden");
+}
+
+hasClass.onchange = () => {
+  inputs.style.display = hasClass.checked ? "grid" : "none";
+};
+
+function saveAdmin(){
+  const data = {
+    hasClass: hasClass.checked,
+    time: timeInput.value,
+    room: roomInput.value
+  };
+
+  db.ref("classData").set(data);
+  closeAdmin();
+}
+
+
+function applyData(data){
+  if (!data.hasClass){
+    timeEl.innerText = "There won’t be any class today!";
+    roomEl.style.display = "none";
+  } else {
+    timeEl.innerText = `Today’s class will be at ${data.time}`;
+    roomEl.innerText = `Class room : ${data.room}`;
+    roomEl.style.display = "block";
+  }
+}
+
+</script>
+</body>
+</html>
